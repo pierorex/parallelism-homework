@@ -1,0 +1,114 @@
+gcc -O cuentaSec.c -o cuentaSec
+./cuentaSec 100000
+Veces que aparece el 5 = 890000
+Tiempo de proceso: 5:944(seg:mseg)
+./cuentaSec 200000
+Veces que aparece el 5 = 1700000
+Tiempo de proceso: 12:152(seg:mseg)
+./cuentaSec 400000
+Veces que aparece el 5 = 3640000
+Tiempo de proceso: 24:621(seg:mseg)
+./cuentaSec 600000
+Veces que aparece el 5 = 5600000
+Tiempo de proceso: 36:942(seg:mseg)
+./cuentaSec 800000
+Veces que aparece el 5 = 7720000
+Tiempo de proceso: 49:509(seg:mseg)
+./cuentaSec 1000000
+Veces que aparece el 5 = 9890000
+Tiempo de proceso: 62: 15(seg:mseg)
+gcc -O3 cuentaSec.c -o cuentaSec
+./cuentaSec 100000
+Veces que aparece el 5 = 890000
+Tiempo de proceso: 1:463(seg:mseg)
+./cuentaSec 200000
+Veces que aparece el 5 = 1700000
+Tiempo de proceso: 3:184(seg:mseg)
+./cuentaSec 400000
+Veces que aparece el 5 = 3640000
+Tiempo de proceso: 7:358(seg:mseg)
+./cuentaSec 600000
+Veces que aparece el 5 = 5600000
+Tiempo de proceso: 11:438(seg:mseg)
+./cuentaSec 800000
+Veces que aparece el 5 = 7720000
+Tiempo de proceso: 15:396(seg:mseg)
+./cuentaSec 1000000
+Veces que aparece el 5 = 9890000
+Tiempo de proceso: 19:462(seg:mseg)
+mpicc -O3 cuentaPar.c -o cuentaPar
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 2 ./cuentaPar 100000
+Numero de veces que aparece el 5 = 890000
+tiempo total = 0:749
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 2 ./cuentaPar 200000
+Numero de veces que aparece el 5 = 1700000
+tiempo total = 1:514
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 2 ./cuentaPar 400000
+Numero de veces que aparece el 5 = 3640000
+tiempo total = 3:640
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 2 ./cuentaPar 600000
+Numero de veces que aparece el 5 = 5600000
+tiempo total = 7:189
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 2 ./cuentaPar 800000
+Numero de veces que aparece el 5 = 7720000
+tiempo total = 11:427
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 2 ./cuentaPar 1000000
+Numero de veces que aparece el 5 = 9890000
+tiempo total = 14:320
+mpicc -O3 cuentaPar.c -o cuentaPar
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 4 ./cuentaPar 100000
+Numero de veces que aparece el 5 = 890000
+tiempo total = 0:384
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 4 ./cuentaPar 200000
+Numero de veces que aparece el 5 = 1700000
+tiempo total = 0:772
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 4 ./cuentaPar 400000
+Numero de veces que aparece el 5 = 3640000
+tiempo total = 1:551
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 4 ./cuentaPar 600000
+Numero de veces que aparece el 5 = 5600000
+tiempo total = 2:257
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 4 ./cuentaPar 800000
+Numero de veces que aparece el 5 = 7720000
+tiempo total = 3:646
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 4 ./cuentaPar 1000000
+Numero de veces que aparece el 5 = 9890000
+tiempo total = 5:509
+mpicc -O3 cuentaPar.c -o cuentaPar
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 8 ./cuentaPar 100000
+Numero de veces que aparece el 5 = 890000
+tiempo total = 0:198
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 8 ./cuentaPar 200000
+Numero de veces que aparece el 5 = 1700000
+tiempo total = 0:405
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 8 ./cuentaPar 400000
+Numero de veces que aparece el 5 = 3640000
+tiempo total = 0:778
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 8 ./cuentaPar 600000
+Numero de veces que aparece el 5 = 5600000
+tiempo total = 1:150
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 8 ./cuentaPar 800000
+Numero de veces que aparece el 5 = 7720000
+tiempo total = 1:556
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 8 ./cuentaPar 1000000
+Numero de veces que aparece el 5 = 9890000
+tiempo total = 1:922
+mpicc -O3 cuentaPar.c -o cuentaPar
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 16 ./cuentaPar 100000
+Numero de veces que aparece el 5 = 890000
+tiempo total = 0:121
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 16 ./cuentaPar 200000
+Numero de veces que aparece el 5 = 1700000
+tiempo total = 0:192
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 16 ./cuentaPar 400000
+Numero de veces que aparece el 5 = 3640000
+tiempo total = 0:423
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 16 ./cuentaPar 600000
+Numero de veces que aparece el 5 = 5600000
+tiempo total = 0:649
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 16 ./cuentaPar 800000
+Numero de veces que aparece el 5 = 7720000
+tiempo total = 0:794
+mpirun --disable-hostname-propagation -f ../maquinas.txt -np 16 ./cuentaPar 1000000
+Numero de veces que aparece el 5 = 9890000
+tiempo total = 0:943

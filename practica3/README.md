@@ -11,7 +11,7 @@
     Elapsed time for buffered send =  5253894 uSec
     Elapsed time for standard send = 10421390 uSec
 
-    We used 150000000 as program argument to stress the program and let us see real time
+    We used 150000000 as argument to stress the program and let us see real time
     differences and consequences:
         - Ready send is the fastest because it doesn't guanrantee that the receive has
           been posted, so it leaves those checks to the programmer.
@@ -32,13 +32,10 @@
     to continue its execution while its message was being delivered to the other one.
 
 3: 
-    We modified the defined MSGLEN from 2048 to 40480, results:
-        - Elapsed time for send using recv         = 10000582 uSec
-        - Elapsed time for send using irecv + wait = 10000485 uSec
+    Results:
+        - Elapsed time for send using recv         = 10000045 uSec
+        - Elapsed time for send using irecv + wait =       41 uSec
 
-    So, the 'isend + wait' strategy did 103 uSec faster than the , mainly because 
-    our implementation of MPI is intelligent enough as to not block for a MPI_Send while
-    a matching receive is being expected, it just waits for the send buffer to be available. 
-    In other implementations of MPI, we could have faced a situation where the MPI_Send
-    would actually block while waiting for the receive (which will take 10 seconds
-    because of the sleep instruction there), thus generating a win of 
+    So, the 'irecv + wait' strategy did 10 seconds faster, mainly because it doesn't 
+    wait for the message to be received entirely, it just registers the message to
+    be received asynchronously by the system and continues with its work without blocking.

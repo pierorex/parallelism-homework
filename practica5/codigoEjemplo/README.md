@@ -1,7 +1,8 @@
 The matrix is represented as an array with N*N positions.
 Implemented a modification of the algorithm used in avg.c, extending it's 
 functionality to also calculate min and max values of each row array and
-return a 3-element array with these results.
+return a 3-element array with these results, and using the same scatter
+strategy of dividing a big array into smaller ones to pass to other nodes.
 After that, these sub arrays are then combined with MPI's Gather into a
 large array of size 3*N. Then, this large array is iterated over inside
 another function which purpose is to accumulate values from each 3-element

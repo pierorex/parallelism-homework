@@ -159,18 +159,18 @@ int main(int argc, char** argv) {
         scanf("%d", &T);
         war_map = read_map(T);
 
-        printf("war_map:\n");
+        /*printf("war_map:\n");
         for (i=0; i<T; i++) {
             printf("%d %d %d\n", war_map[i*3], war_map[i*3+1], war_map[i*3+2]);
         }
-        printf("\n");
+        printf("\n");*/
 
         scanf("%d", &B);
         attacks = read_attacks(B);
 
-        printf("attacks:\n");
+        /*printf("attacks:\n");
         for (i=0; i<B; i++) printf("%d %d %d %d\n", attacks[i*4], attacks[i*4+1], attacks[i*4+2], attacks[i*4+3]);
-        printf("\n");
+        printf("\n");*/
 
         // send N, B and attacks to all slave processes
         for (i=1; i<world_size; i++) {
@@ -212,9 +212,9 @@ int main(int argc, char** argv) {
 
     // run bombing simulation on your subset
     int *sub_war_result = run_simulation(targets_per_node, sub_war_map, B, attacks);
-    printf("I am the process %d and my war results are: (%d %d %d %d %d %d)\n",
+    /*printf("I am the process %d and my war results are: (%d %d %d %d %d %d)\n",
            world_rank, sub_war_result[0], sub_war_result[1], sub_war_result[2],
-           sub_war_result[3], sub_war_result[4], sub_war_result[5]);
+           sub_war_result[3], sub_war_result[4], sub_war_result[5]);*/
   
     // gather all partial results down to the root process
     int *sub_war_results = NULL;
@@ -228,15 +228,22 @@ int main(int argc, char** argv) {
     int *war_results, *original_results;
     if (world_rank == 0) {
         war_results = accumulate_simulations(sub_war_results, 6 * world_size);
-        printf("%d %d %d %d %d %d\n",
-               war_results[0], war_results[1], war_results[2],
-               war_results[3], war_results[4], war_results[5]);
+        printf("Military Targets totally destroyed: %d\n", war_results[0]);
+        printf("Military Targets partially destroyed: %d\n", war_results[1]);
+        printf("Military Targets not affected: %d\n", war_results[2]);
+        printf("Civilian Targets totally destroyed: %d\n", war_results[3]);
+        printf("Civilian Targets partially destroyed: %d\n", war_results[4]);
+        printf("Civilian Targets not affected: %d\n", war_results[5]);
 
         // Compute the average across the original data for comparison
         original_results = run_simulation(T, war_map, B, attacks);
-        printf("%d %d %d %d %d %d\n",
-               original_results[0], original_results[1], original_results[2],
-               original_results[3], original_results[4], original_results[5]);
+        printf("\nREAL RESULTS (NOT PARALLEL):\n\n");
+        printf("Military Targets totally destroyed: %d\n", original_results[0]);
+        printf("Military Targets partially destroyed: %d\n", original_results[1]);
+        printf("Military Targets not affected: %d\n", original_results[2]);
+        printf("Civilian Targets totally destroyed: %d\n", original_results[3]);
+        printf("Civilian Targets partially destroyed: %d\n", original_results[4]);
+        printf("Civilian Targets not affected: %d\n", original_results[5]);
     }
 
     // Clean up

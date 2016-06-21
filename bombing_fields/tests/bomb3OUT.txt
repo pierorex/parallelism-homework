@@ -1,5 +1,5 @@
-Military Targets totally destroyed: 1
-Military Targets partially destroyed: 1
+Military Targets totally destroyed: 2
+Military Targets partially destroyed: 0
 Military Targets not affected: 1
 Civilian Targets totally destroyed: 1
 Civilian Targets partially destroyed: 1

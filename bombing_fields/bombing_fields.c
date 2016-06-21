@@ -11,6 +11,7 @@ Authors:
 #include <stdlib.h>
 #include <mpi.h>
 #include <assert.h>
+#include <unistd.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -160,7 +161,7 @@ int *accumulate_simulations(int *array, int num_elements) {
 }
 
 
-int *read_targets(int T){
+int *read_targets(int T, FILE *fp){
     // our targets will be in a big array like
     // [x1,y1,value1, x2,y2,value2, x3,y3,value3, ..., xi,yi,valuei]
     // x, y := target's coordinate on a 2D plane
@@ -170,7 +171,7 @@ int *read_targets(int T){
     assert(targets != NULL);
 
     for (i = 0; i < T; i++) {
-        scanf("%d %d %d", &x, &y, &target_value);
+        fscanf(fp, "%d %d %d", &x, &y, &target_value);
         targets[i*3] = x;
         targets[i*3 + 1] = y;
         targets[i*3 + 2] = target_value;
@@ -178,7 +179,7 @@ int *read_targets(int T){
     return targets;
 }
 
-int *read_attacks(int B) {
+int *read_attacks(int B, FILE *fp) {
     // our attacks will be in a big array like
     // [x1,y1,r1,p1, x2,y2,r2,p2, x3,y3,r3,p3, ..., xi,yi,ri,pi]
     // x, y := attacks coordinates on a 2D plane
@@ -187,9 +188,10 @@ int *read_attacks(int B) {
     int i, x, y, radius, power;
     int *attacks = (int *) malloc(sizeof(int) * B * 4);
     assert(attacks != NULL);
+    for (i = 0; i < B*4; i++) attacks[i] = 0;
 
     for (i=0; i<B; i++) {
-        scanf("%d %d %d %d", &x, &y, &radius, &power);
+        fscanf(fp, "%d %d %d %d", &x, &y, &radius, &power);
         attacks[i*4] = x;
         attacks[i*4 + 1] = y;
         attacks[i*4 + 2] = radius;
@@ -204,16 +206,20 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
+    FILE * fp;
+
+    fp = fopen(argv[1], "r");
+
     int *targets = NULL, *attacks = NULL;
 
     if (world_rank == 0) {
         // read input on the root process
-        scanf("%d", &N);
-        scanf("%d", &T);
-        targets = read_targets(T);
+        fscanf(fp, "%d", &N);
+        fscanf(fp, "%d", &T);
+        targets = read_targets(T, fp);
 
-        scanf("%d", &B);
-        attacks = read_attacks(B);
+        fscanf(fp, "%d", &B);
+        attacks = read_attacks(B, fp);
 
         // send N, T, B and attacks to all slave processes
         for (i=1; i<world_size; i++) {
@@ -305,7 +311,7 @@ int main(int argc, char** argv) {
 
         // Compute results across the original data for comparison
         // (comment the next line for production, it's meant just for testing)
-        run_sequential(T, targets, B, attacks);
+        //run_sequential(T, targets, B, attacks);
     }
 
     // Clean up

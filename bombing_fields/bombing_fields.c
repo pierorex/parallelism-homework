@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <string.h>
 
 
 int hit_target(int target_value, int attack_power) {
@@ -32,6 +33,10 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
     int *results = (int *) malloc(sizeof(int) * 6);
     int *status = (int *) malloc(sizeof(int) * T);     // status[i] =  0=>intact | 1=>hit | -1=>killed 
     bool *civil = (bool *) malloc(sizeof(bool) * T);    // civil[i] =   true=>civilian | false=>military
+    /*printf("T=%d\ntargets = ", T);
+    for (i=0; i<3*T; i++)
+        printf("%d ", targets[i]);
+    printf("\n");*/
 
     for(i = 0; i < T; i++) {
         status[i] = 0;
@@ -208,7 +213,15 @@ int main(int argc, char** argv) {
     // array
     int targets_per_node = T / world_size;
     int segment_length = 3 * targets_per_node;
-    int *sub_targets = (int *) malloc(sizeof(int) * segment_length);
+    int extra_targets = 0;
+
+    // handle special case when number of processes (world_size) is not a
+    // multiple of the number of targets (T). In this case we add some
+    // space for extra targets in the master node
+    if (world_rank == 0 && T % world_size != 0)
+        extra_targets = T % world_size;
+
+    int *sub_targets = (int *) malloc(sizeof(int) * (segment_length + 3*extra_targets));
     assert(sub_targets != NULL);
 
     // Scatter the targets from the root process to all processes in
@@ -216,21 +229,33 @@ int main(int argc, char** argv) {
     MPI_Scatter(targets, segment_length, MPI_INT, sub_targets, 
                 segment_length, MPI_INT, 0, MPI_COMM_WORLD);
 
-    printf("targets_per_node=%d segment_length=%d\nsub_targets = ", targets_per_node, segment_length);
+    if (world_rank == 0 && extra_targets != 0) {
+        // we added space for extra targets in master, now we add those targets
+        for (i = 0; i < 3*extra_targets; i++)
+            sub_targets[segment_length + i] = targets[segment_length*world_size + i];
+        /*printf("extra_targets=%d init_extra=%d end_extra=%d\n", extra_targets, 
+                segment_length*world_size, segment_length*world_size + 3*extra_targets);
+        printf("master sub_targets = ");
+        for (i=0; i<segment_length+3*extra_targets; i++) printf("%d ", sub_targets[i]);
+        printf("\n");*/
+    }
+
+    /*printf("\ntargets_per_node=%d segment_length=%d\nsub_targets = ", targets_per_node, segment_length);
     for(i=0; i<segment_length; i++){
         printf("%d ", sub_targets[i]);
     }
-    printf("\n");
+    printf("\n");*//*
     printf("B=%d\nattacks = ", B);
     for(i=0; i<B*4; i++){
         printf("%d ", attacks[i]);
     }
-    printf("\n");
+    printf("\n");*/
 
     // run bombing simulation on your subset
-    int *sub_war_result = run_simulation(targets_per_node, sub_targets, B, attacks);
-    printf("%d %d %d %d %d %d\n", sub_war_result[0], sub_war_result[1],
-        sub_war_result[2], sub_war_result[3], sub_war_result[4], sub_war_result[5]);
+    int *sub_war_result = run_simulation(targets_per_node + extra_targets,
+                                         sub_targets, B, attacks);
+    /*printf("%d %d %d %d %d %d\n", sub_war_result[0], sub_war_result[1],
+        sub_war_result[2], sub_war_result[3], sub_war_result[4], sub_war_result[5]);*/
   
     // gather all partial results down to the root process
     int *sub_war_results = NULL;

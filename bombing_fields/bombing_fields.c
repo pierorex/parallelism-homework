@@ -33,7 +33,6 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
     int *status = (int *) malloc(sizeof(int) * T);     // status[i] =  0=>intact | 1=>hit | -1=>killed 
     bool *civil = (bool *) malloc(sizeof(bool) * T);    // civil[i] =   true=>civilian | false=>military
 
-    mt_kill = mt_hit = mt_intact = ct_kill = ct_hit = ct_intact = 0;
     x = 0;
     y = 1;
     r = 2;
@@ -56,20 +55,23 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
                 else civil[j] = false;
             }
 
-            /*printf("    Target[%d] | x=%d y=%d | inside=%d | civil=%d | value=%d\n", j, targets[j*3 + x], targets[j*3 + y],
+            /*printf("    Target[%d] | x=%d y=%d | inside=%d | civil=%d | value=%d | status=%d\n", j, targets[j*3 + x], targets[j*3 + y],
                     inside_square(targets[j*3 + x], targets[j*3 + y], left, right, top, bottom), civil[j], 
-                    targets[j*3 + value]);*/
+                    targets[j*3 + value], status[j]);*/
 
             // if the target is not dead, hit it and see if it dies
-            if (!status[j] != -1 && inside_square(targets[j*3 + x], targets[j*3 + y], left, right, top, bottom)){
+            if (status[j] != -1 && inside_square(targets[j*3 + x], targets[j*3 + y], left, right, top, bottom)){
                 // hit the target's value (health points)
                 targets[j*3 + value] = hit_target(targets[j*3 + value], power);
 
                 if (targets[j*3 + value] == 0) status[j] = -1;  // kill target j
                 else status[j] = 1;                             // hit target j becaue it's not dead yet
+                //printf("    status=%d\n", status[j]);
             }
         }
     }
+
+    mt_kill = mt_hit = mt_intact = ct_kill = ct_hit = ct_intact = 0;
 
     for (i = 0; i < T; i++) {
         switch(status[i]) {

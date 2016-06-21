@@ -28,21 +28,23 @@ bool inside_square(int x, int y, int left, int right, int top, int bottom) {
 
 // Computes the average of an array of numbers
 int *run_simulation(int T, int *targets, int B, int *attacks) {
-    int i, j, mt_kill, mt_hit, mt_intact, ct_kill, ct_hit, ct_intact, x, y, r, p, value, left, right, top, bottom, power;
+    int i, j, mt_kill, mt_hit, mt_intact, ct_kill, ct_hit, ct_intact,
+        value, left, right, top, bottom, x, y, r, p, power;
 
-    int *results = (int *) malloc(sizeof(int) * 6);
-    int *status = (int *) malloc(sizeof(int) * T);     // status[i] =  0=>intact | 1=>hit | -1=>killed 
-    bool *civil = (bool *) malloc(sizeof(bool) * T);    // civil[i] =   true=>civilian | false=>military
+    int *results = (int *) malloc(sizeof (int) * 6);
+    int *status  = (int *) malloc(sizeof (int) * T);  // status[i] =  0=>intact | 1=>hit | -1=>killed 
+    bool *civil = (bool *) malloc(sizeof(bool) * T);  // civil[i] =   true=>civilian | false=>military
     /*printf("T=%d\ntargets = ", T);
     for (i=0; i<3*T; i++)
         printf("%d ", targets[i]);
     printf("\n");*/
 
     for(i = 0; i < T; i++) {
-        status[i] = 0;
-        civil[i] = false;
+        status[i] = 0;          // all targets are 'intact'
+        civil[i] = false;       // all targets are military (we turn them into civilian as soon as we scan them)
     }
 
+    // shortcuts to find attack's parameters (e.g. x coordinate is attacks[i*4 + x], etc)
     x = 0;
     y = 1;
     r = 2;
@@ -59,8 +61,8 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
         //printf("Attack[%d] | left=%d right=%d top=%d bottom=%d | power=%d\n", i, left, right, top, bottom, power);
 
         for (j=0; j<T; j++) {
-            // classify military and civilian targets on first round of attacks
             if (i == 0) {
+                // classify targets as military or civilian on the first round of attacks
                 if (targets[j*3 + value] > 0) civil[j] = true;
                 else civil[j] = false;
             }
@@ -69,12 +71,13 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
                     inside_square(targets[j*3 + x], targets[j*3 + y], left, right, top, bottom), civil[j], 
                     targets[j*3 + value], status[j]);*/
 
-            // if the target is not dead, hit it and see if it dies
             if (status[j] != -1 && inside_square(targets[j*3 + x], targets[j*3 + y], left, right, top, bottom)){
+                // target is not dead but is within attack's radius
+
                 // hit the target's value (health points)
                 targets[j*3 + value] = hit_target(targets[j*3 + value], power);
 
-                if (targets[j*3 + value] == 0) status[j] = -1;  // kill target j
+                if (targets[j*3 + value] == 0) status[j] = -1;  // kill target j if health points == 0
                 else status[j] = 1;                             // hit target j becaue it's not dead yet
                 //printf("    status=%d\n", status[j]);
             }
@@ -83,6 +86,7 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
 
     mt_kill = mt_hit = mt_intact = ct_kill = ct_hit = ct_intact = 0;
 
+    // count how many got hit, killed or stayed intact
     for (i = 0; i < T; i++) {
         switch(status[i]) {
             case 0:
@@ -100,6 +104,7 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
         }
     }
 
+    // build a results array to be returned
     results[0] = mt_kill;
     results[1] = mt_hit;
     results[2] = mt_intact;
@@ -111,6 +116,7 @@ int *run_simulation(int T, int *targets, int B, int *attacks) {
 
 
 void run_sequential(int T, int *targets, int B, int *attacks) {
+    // debugging function built to compare results against the parallel version
     int *original_results = run_simulation(T, targets, B, attacks);
     printf("\nREAL RESULTS (NOT PARALLEL):\n\n");
     printf("Military Targets totally destroyed: %d\n", original_results[0]);
@@ -124,26 +130,30 @@ void run_sequential(int T, int *targets, int B, int *attacks) {
 
 
 int *accumulate_simulations(int *array, int num_elements) {
+    // accumulate results arrays from many simulations into a single one
+    // containing the sum of all simulations' attributes
     int *results = (int *) malloc(sizeof(int) * 6);
 
     int i;
     for (i=0; i < 6; i++) results[i] = 0;
 
     for (i = 0; i < num_elements; i+=6) {
-        results[0] += array[i];
-        results[1] += array[i+1];
-        results[2] += array[i+2];
-        results[3] += array[i+3];
-        results[4] += array[i+4];
-        results[5] += array[i+5];
+        results[0] += array[i];     // mt_kill
+        results[1] += array[i+1];   // mt_hit
+        results[2] += array[i+2];   // mt_intact
+        results[3] += array[i+3];   // ct_kill
+        results[4] += array[i+4];   // ct_hit
+        results[5] += array[i+5];   // ct_intact
     }
     return results;
 }
 
 
-int *read_map(int T){
-    // our map will be a big array like
+int *read_targets(int T){
+    // our targets will be in a big array like
     // [x1,y1,value1, x2,y2,value2, x3,y3,value3, ..., xi,yi,valuei]
+    // x, y := target's coordinate on a 2D plane
+    // value := target's health points
     int i, x, y, target_value;
     int *targets = (int *) malloc(sizeof(int) * T * 3);
     assert(targets != NULL);
@@ -158,18 +168,21 @@ int *read_map(int T){
 }
 
 int *read_attacks(int B) {
-    // our attacks will be an array like
+    // our attacks will be in a big array like
     // [x1,y1,r1,p1, x2,y2,r2,p2, x3,y3,r3,p3, ..., xi,yi,ri,pi]
-    int i, x, y, r, p;
+    // x, y := attacks coordinates on a 2D plane
+    // r := radius of attack. Using (x,y) and r we can build a squared area of damage
+    // p := power of the attack
+    int i, x, y, radius, power;
     int *attacks = (int *) malloc(sizeof(int) * B * 4);
     assert(attacks != NULL);
 
     for (i=0; i<B; i++) {
-        scanf("%d %d %d %d", &x, &y, &r, &p);
+        scanf("%d %d %d %d", &x, &y, &radius, &power);
         attacks[i*4] = x;
         attacks[i*4 + 1] = y;
-        attacks[i*4 + 2] = r;
-        attacks[i*4 + 3] = p;
+        attacks[i*4 + 2] = radius;
+        attacks[i*4 + 3] = power;
     }
     return attacks;
 }
@@ -180,13 +193,13 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
-    // read input on the root process
     int *targets = NULL, *attacks = NULL;
 
     if (world_rank == 0) {
+        // read input on the root process
         scanf("%d", &N);
         scanf("%d", &T);
-        targets = read_map(T);
+        targets = read_targets(T);
 
         scanf("%d", &B);
         attacks = read_attacks(B);

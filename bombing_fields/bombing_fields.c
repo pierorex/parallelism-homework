@@ -1,13 +1,22 @@
+/*
+Bombing Fields. Problem statement taken from VegaSol vacational Park, Mérida, Venezuela, july 9~13, 2012
+In this program we give a parallel programming solution to this simulation problem
+using MPI.
+
+Authors:
+    - Jean Piero Hernández Meze 
+    - Reinaldo Verdugo
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
 #include <assert.h>
-#include <unistd.h>
 #include <stdbool.h>
 #include <string.h>
 
 
 int hit_target(int target_value, int attack_power) {
+    // decrease target's value (hp) depending on whether it's military or civilian
     if (target_value > 0) {
         if (attack_power >= target_value) return 0;
         else return target_value - attack_power;
@@ -26,8 +35,10 @@ bool inside_square(int x, int y, int left, int right, int top, int bottom) {
 }
 
 
-// Computes the average of an array of numbers
 int *run_simulation(int T, int *targets, int B, int *attacks) {
+    // computes bombing results, indicating how many civilian and military
+    // targets got killed (destroyed), hit or were left intact
+
     int i, j, mt_kill, mt_hit, mt_intact, ct_kill, ct_hit, ct_intact,
         value, left, right, top, bottom, x, y, r, p, power;
 
@@ -270,9 +281,10 @@ int main(int argc, char** argv) {
     /*printf("%d %d %d %d %d %d\n", sub_war_result[0], sub_war_result[1],
         sub_war_result[2], sub_war_result[3], sub_war_result[4], sub_war_result[5]);*/
   
-    // gather all partial results down to the root process
     int *sub_war_results = NULL;
+
     if (world_rank == 0) {
+        // gather all partial results down to the root process
         sub_war_results = (int *) malloc(sizeof(int) * 6 * world_size);
         assert(sub_war_results != NULL);
     }
@@ -280,7 +292,9 @@ int main(int argc, char** argv) {
                MPI_COMM_WORLD);
 
     int *war_results;
+
     if (world_rank == 0) {
+        // sum up all simulations' results
         war_results = accumulate_simulations(sub_war_results, 6 * world_size);
         printf("Military Targets totally destroyed: %d\n", war_results[0]);
         printf("Military Targets partially destroyed: %d\n", war_results[1]);
@@ -290,6 +304,7 @@ int main(int argc, char** argv) {
         printf("Civilian Targets not affected: %d\n", war_results[5]);
 
         // Compute results across the original data for comparison
+        // (comment the next line for production, it's meant just for testing)
         run_sequential(T, targets, B, attacks);
     }
 

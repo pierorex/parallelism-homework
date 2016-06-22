@@ -2,8 +2,9 @@
 /* Programa e8.c */
 #include "stdio.h"
 #include "stdlib.h"
+#include <math.h>
 
-static long num_steps=1000000000; double step, pi;
+static long num_steps=1000; double step, pi;
 
 void main()
 {  int i;	
@@ -16,5 +17,6 @@ void main()
       sum = sum + 4.0/(1.0 + x*x);
    }
    pi = step * sum;
-   printf("Pi = %f\n",pi);
+   printf("Pi = %.6lf\n", pi);
+   printf("Error = %.6lf\n", fabs(pi - M_PI));
 }

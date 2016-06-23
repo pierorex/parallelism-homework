@@ -4,5 +4,5 @@ Military Targets not affected: 0
 Civilian Targets totally destroyed: 9610
 Civilian Targets partially destroyed: 15452
 Civilian Targets not affected: 0
-4.53user 0.01system 0:02.33elapsed 195%CPU (0avgtext+0avgdata 7288maxresident)k
-0inputs+8outputs (0major+8146minor)pagefaults 0swaps
+0.48user 0.04system 0:00.39elapsed 132%CPU (0avgtext+0avgdata 5740maxresident)k
+0inputs+8outputs (0major+3972minor)pagefaults 0swaps

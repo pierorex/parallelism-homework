@@ -14,8 +14,6 @@ PI calculation using Monte Carlo simulation
            1000000     0.001393         0.613
           10000000     0.000459         7.076
 
-        - Parallelization is not the right answer for this problem
-
 
 Matrix Multiplication:
     - Results:

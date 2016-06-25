@@ -1,0 +1,8 @@
+Military Targets totally destroyed: 13596
+Military Targets partially destroyed: 11349
+Military Targets not affected: 0
+Civilian Targets totally destroyed: 13493
+Civilian Targets partially destroyed: 11562
+Civilian Targets not affected: 0
+11.44user 0.09system 0:05.82elapsed 197%CPU (0avgtext+0avgdata 11148maxresident)k
+0inputs+8outputs (0major+17601minor)pagefaults 0swaps
